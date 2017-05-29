@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Pear</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_level">Level</string>
+    <string name="action_sandbox">Sandbox</string>
+    <string name="action_medium">Medium</string>
+    <string name="action_russia">Russia</string>
+</resources>

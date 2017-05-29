@@ -1,0 +1,28 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context="com.lab.gruszczynski.pear.MainActivity">
+    <item android:id="@+id/action_settings"
+          android:title="@string/action_settings"
+          android:orderInCategory="100"
+          app:showAsAction="ifRoom"/>
+    <item android:id="@+id/action_level"
+          android:title="@string/action_level"
+          android:orderInCategory="100"
+          app:showAsAction="ifRoom">
+    <menu>
+        <item android:id="@+id/action_sandbox"
+              android:title="@string/action_sandbox"
+              android:orderInCategory="100"
+              app:showAsAction="never"/>
+        <item android:id="@+id/action_medium"
+              android:title="@string/action_medium"
+              android:orderInCategory="100"
+              app:showAsAction="never"/>
+        <item android:id="@+id/action_russia"
+              android:title="@string/action_russia"
+              android:orderInCategory="100"
+              app:showAsAction="never"/>
+    </menu>
+    </item>
+</menu>
