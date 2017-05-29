@@ -1,11 +1,15 @@
 package com.lab.gruszczynski.pear;
 import android.content.Context;
         import android.graphics.*;
-        import android.util.Log;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.util.Log;
         import android.view.*;
         import java.util.Random;
 
-public class PaintView extends SurfaceView implements SurfaceHolder.Callback{
+public class PaintView extends SurfaceView implements SurfaceHolder.Callback, SensorEventListener {
 
     Paint paint = new Paint();
     Bitmap pear;
@@ -35,23 +39,27 @@ public class PaintView extends SurfaceView implements SurfaceHolder.Callback{
     boolean b9=true;
     boolean b10=true;
     boolean stroboscope;
+    private SensorManager mSensorManager;
+    private Sensor mRotationVectorSensor;
 
     private SurfaceHolder holder=getHolder();
-    Canvas c;
     protected GameLogic gameLogic;
 
 
-    public PaintView(Context context,MainActivity m) {
+    public PaintView(Context context, MainActivity mainActivity, SensorManager sensorManager) {
 
         super(context);
-        mainActivity =m;
-        gameLogic =new GameLogic(holder,this, mainActivity);
+        this.mainActivity =mainActivity;
+        gameLogic =new GameLogic(holder,this, this.mainActivity);
 
         paint = new Paint();
         pearStartBit =BitmapFactory.decodeResource(getResources(), R.drawable.start);
 
         getHolder().addCallback(this);
         setFocusable(true);
+
+        mSensorManager = sensorManager;
+        mRotationVectorSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
     }
 
 
@@ -103,8 +111,7 @@ public class PaintView extends SurfaceView implements SurfaceHolder.Callback{
             paint.setTextAlign(Paint.Align.CENTER);
             //paint.setSubpixelText(true);
 
-            //ZABAWA TŁEM
-
+            //TŁO
             canvas.drawColor(Color.WHITE);
 
             //TAP TO PLAY
@@ -320,6 +327,37 @@ public class PaintView extends SurfaceView implements SurfaceHolder.Callback{
         if(w!=0) digits[2]=w%10;
     }
 
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+    // we received a sensor event. it is a good practice to check
+            // that we received the proper event
+            if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+                // convert the rotation-vector to a 4x4 matrix. the matrix
+                // is interpreted by Open GL as the inverse of the
+                // rotation-vector, which is what we want.
+                //SensorManager.getRotationMatrixFromVector(
+                        //mRotationMatrix , event.values);
+                StringBuilder allValues = new StringBuilder();
+                for(float v: event.values){
+                    allValues.append(v+" ");
+                }
+                Log.d("ROTATION", allValues.toString());
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+
+    public void start() {
+        mSensorManager.registerListener( this, mRotationVectorSensor, 10000);
+    }
+
+    public void stop() {
+        // make sure to turn our sensor off when the activity is paused
+        mSensorManager.unregisterListener(this);
+    }
 }
 
 

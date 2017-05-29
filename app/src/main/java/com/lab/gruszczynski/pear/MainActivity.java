@@ -2,6 +2,8 @@ package com.lab.gruszczynski.pear;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -17,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
     private RelativeLayout content_main_layout;
     private final String sharedPrefs = "sharedPrefs";
     private final String highScoreKey = "highScore";
+    private SensorManager mSensorManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,14 +27,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        paintView = new PaintView(this, this);
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        paintView = new PaintView(this, this, mSensorManager);
         preferences = this.getSharedPreferences(sharedPrefs, Context.MODE_PRIVATE);
         gameLogic = paintView.gameLogic;
 
         content_main_layout = (RelativeLayout) findViewById(R.id.content_main);
         paintView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
         content_main_layout.addView(paintView);
-
 
     }
 
@@ -55,6 +58,18 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        paintView.start();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        paintView.stop();
     }
 
     public void saveHighScore(int highScore) {
