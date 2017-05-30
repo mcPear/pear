@@ -335,7 +335,7 @@ public class GameLogic extends Thread {
                     try {
                         Thread.sleep(1);
                     } catch (InterruptedException e) {
-                        ;
+
                     }
                 }
 

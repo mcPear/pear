@@ -39,8 +39,11 @@ public class PaintView extends SurfaceView implements SurfaceHolder.Callback, Se
     boolean b9=true;
     boolean b10=true;
     boolean stroboscope;
-    private SensorManager mSensorManager;
-    private Sensor mRotationVectorSensor;
+    private SensorManager sensorManager;
+    Sensor rotationVectorSensor;
+    private float[] mRotationVector;
+    private final float MAX_ROLL = 1f;
+    GameTheme gameTheme;
 
     private SurfaceHolder holder=getHolder();
     protected GameLogic gameLogic;
@@ -58,8 +61,12 @@ public class PaintView extends SurfaceView implements SurfaceHolder.Callback, Se
         getHolder().addCallback(this);
         setFocusable(true);
 
-        mSensorManager = sensorManager;
-        mRotationVectorSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+        this.sensorManager = sensorManager;
+        rotationVectorSensor = this.sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+
+        gameTheme = new GameTheme();
+        gameTheme.setTextColor(Color.RED);
+        gameTheme.setBackgroundColor(Color.BLUE);
     }
 
 
@@ -73,8 +80,8 @@ public class PaintView extends SurfaceView implements SurfaceHolder.Callback, Se
         pear = Bitmap.createScaledBitmap(pearStartBit, (int)(width /4.64), (int)(width *0.353), true); //magic numbers - są sprawdzone i tyle
         s1Bit=BitmapFactory.decodeResource(getResources(), R.drawable.fullarrow);
         arr1 =Bitmap.createScaledBitmap(s1Bit, (int)(width /14.29), (int)(width *0.17), true);
-        arr2 = arr1; arr3= arr1; arr4 = arr1; arr5 = arr1;
-        gameLogic.start();
+        arr5 = arr4 = arr3 = arr2 = arr1;
+        if(!gameLogic.isAlive()) gameLogic.start();
     }
 
     public void surfaceDestroyed(SurfaceHolder arg0) {
@@ -83,17 +90,13 @@ public class PaintView extends SurfaceView implements SurfaceHolder.Callback, Se
 
     public boolean onTouchEvent(MotionEvent event) {
 
-        //USTAWIENIE GRUSZKI WZGLĘDEM PALCA
-        if(gameLogic.gameState ==0)
-        pearXY[0]=event.getX()- pear.getWidth()/2;
-
         // OBSŁUGA KLIKNIĘCIA PLAY AGAIN
         if(gameLogic.gameState ==-1&&event.getY()< height /2-10){
             gameLogic.again=true; //ZNACZY, ZE KLIKNIĘTO PLAY AGAIN, POTRZEBNE DO CHOWANIA WYNIKU POWOLI
-        gameLogic.gameState =0; }
+            gameLogic.gameState =0; }
 
         //OBSŁUGA KLIKNIĘCIA NA EKRAN STARTOWY
-        if(gameLogic.gameState ==2){
+        else if(gameLogic.gameState ==2){
             gameLogic.gameState =0; }
 
 
@@ -182,8 +185,8 @@ public class PaintView extends SurfaceView implements SurfaceHolder.Callback, Se
             }b5=false;}
             else if (gameLogic.result < 240)
             {if(b6){
-                pearBit = BitmapFactory.decodeResource(getResources(), R.drawable.frumapwhite);
-                pear = Bitmap.createScaledBitmap(pearBit, (int)(width /4.64), (int)(width *0.353), true);
+                Bitmap.Config conf = Bitmap.Config.ARGB_8888;
+                pear = Bitmap.createBitmap(1,1,conf);
             }b6=false;}
             else if (gameLogic.result < 290)
             {if(b7){
@@ -219,13 +222,13 @@ public class PaintView extends SurfaceView implements SurfaceHolder.Callback, Se
                 canvas.drawColor(Color.RED);
 
             else
-            canvas.drawColor(Color.WHITE); //// Tło
+            canvas.drawColor(gameTheme.getBackgroundColor()); //// Tło
             stroboscope =!stroboscope;
             paint.setColor(Color.BLACK);
 
-            //BLOKOWANIE CHOWANIA SIĘ GRUSZKI
+            /*//BLOKOWANIE CHOWANIA SIĘ GRUSZKI
             if (pearXY[0] > width - pear.getWidth()) pearXY[0] = width - pear.getWidth();
-            else if (pearXY[0] < 0) pearXY[0] = 0;
+            else if (pearXY[0] < 0) pearXY[0] = 0;*/
 
             //RYSOWANIE GRUSZKI I STRZAŁ
             canvas.drawBitmap(pear, pearXY[0], pearXY[1], paint);
@@ -259,21 +262,23 @@ public class PaintView extends SurfaceView implements SurfaceHolder.Callback, Se
             // WYPISANIE WYNIKU ZARAZ PO ZDERZENIU
             if (gameLogic.gameState != 0 || gameLogic.gameState == 0 && gameLogic.again == true) {
 
-                paint.setARGB(gameLogic.intensitySCORE, 100, 170, 0);
+                //paint.setARGB(gameLogic.intensitySCORE, 100, 170, 0);
+                paint.setColor(gameTheme.getTextColor());
+                paint.setAlpha(gameLogic.intensitySCORE);
                 paint.setTextAlign(Paint.Align.CENTER);
                 paint.setSubpixelText(true);
 
                 paint.setTextSize((float) (height / 3.2));
                 canvas.drawText("" + gameLogic.resultToShow, width / 2, (float) (height / 3.5), paint);
 
-                paint.setARGB(gameLogic.intensitySCORE, 100, 190, 0);
+                //paint.setARGB(gameLogic.intensitySCORE, 100, 190, 0);
                 paint.setTextSize((float) (height / 10));
                 if (gameLogic.result == 1) canvas.drawText("ARROW", width / 2, (float) (height / 2.7), paint);
                 else canvas.drawText("ARROWS", width / 2, (float) (height / 2.7), paint);
                 //canvas.drawText("BEST: "+context.loadHighScore(),10,150,paint); //BEST
 
                 //WYPISANIE BESTA ROZPROSZONEGO
-                paint.setARGB(gameLogic.intensitySCORE, 0, 200, 0);
+                //paint.setARGB(gameLogic.intensitySCORE, 0, 200, 0);
                 paint.setTextSize((float) (height / 16));
                 paint.setTextAlign(Paint.Align.RIGHT);
                 spreadBestText();
@@ -301,7 +306,9 @@ public class PaintView extends SurfaceView implements SurfaceHolder.Callback, Se
             if (gameLogic.gameState == -1) {
                 paint.setTextAlign(Paint.Align.CENTER);
                 paint.setTextSize((float) (height / 15));
-                paint.setARGB(gameLogic.intensityPLAYAGAIN, 100, 190, 0);
+                //paint.setARGB(gameLogic.intensityPLAYAGAIN, 100, 190, 0);
+                paint.setColor(gameTheme.getTextColor());
+                paint.setAlpha(gameLogic.intensityPLAYAGAIN);
                 canvas.drawText("PLAY AGAIN", width / 2, height / 2, paint);
             }
 
@@ -329,35 +336,42 @@ public class PaintView extends SurfaceView implements SurfaceHolder.Callback, Se
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-    // we received a sensor event. it is a good practice to check
-            // that we received the proper event
-            if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
-                // convert the rotation-vector to a 4x4 matrix. the matrix
-                // is interpreted by Open GL as the inverse of the
-                // rotation-vector, which is what we want.
-                //SensorManager.getRotationMatrixFromVector(
-                        //mRotationMatrix , event.values);
-                StringBuilder allValues = new StringBuilder();
-                for(float v: event.values){
-                    allValues.append(v+" ");
-                }
-                Log.d("ROTATION", allValues.toString());
+
+        float R[] = new float[9];
+        if(event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+            mRotationVector = event.values;
+            SensorManager.getRotationMatrixFromVector(R, mRotationVector);
+        }
+
+        float orientation[] = new float[9];
+        SensorManager.getOrientation(R, orientation);
+
+        float azimuth = orientation[0];
+        float pitch = orientation[1];
+        float roll = orientation[2];
+        Log.w("AZIMUTH, PITCH, ROLL", String.valueOf(azimuth) + " " + String.valueOf(pitch) + " " + String.valueOf(roll));
+
+        if(gameLogic.gameState ==0){
+            if(roll> MAX_ROLL){pearXY[0]=width-pear.getWidth();}
+            else if(roll<-MAX_ROLL){pearXY[0]=0;}
+            else{
+                pearXY[0] = width/2 + roll/ MAX_ROLL *width;
+            }
         }
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-    }
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
     public void start() {
-        mSensorManager.registerListener( this, mRotationVectorSensor, 10000);
+        int sensorDelay = SensorManager.SENSOR_DELAY_FASTEST;
+        sensorManager.registerListener(this, rotationVectorSensor, sensorDelay);
     }
 
     public void stop() {
-        // make sure to turn our sensor off when the activity is paused
-        mSensorManager.unregisterListener(this);
+        sensorManager.unregisterListener(this);
     }
+
 }
 
 

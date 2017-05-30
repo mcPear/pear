@@ -5,4 +5,5 @@
     <string name="action_sandbox">Sandbox</string>
     <string name="action_medium">Medium</string>
     <string name="action_russia">Russia</string>
+    <string name="theme_blue">Blue Theme</string>
 </resources>
