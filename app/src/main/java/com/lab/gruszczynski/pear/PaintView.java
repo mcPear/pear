@@ -27,7 +27,7 @@ public class PaintView extends SurfaceView implements SurfaceHolder.Callback, Se
     private MainActivity mainActivity;
     int height;
     int width;
-    private int [] digits =new int[3];
+    private int [] digits = new int[3];
     boolean b1=true;
     boolean b2=true;
     boolean b3=true;
@@ -42,18 +42,18 @@ public class PaintView extends SurfaceView implements SurfaceHolder.Callback, Se
     private SensorManager sensorManager;
     Sensor rotationVectorSensor;
     private float[] mRotationVector;
-    private final float MAX_ROLL = 1f;
+    private final float MAX_ROLL = 0.6f;
     GameTheme gameTheme;
 
     private SurfaceHolder holder=getHolder();
-    protected GameLogic gameLogic;
+    GameLogic gameLogic;
 
 
-    public PaintView(Context context, MainActivity mainActivity, SensorManager sensorManager) {
+    public PaintView(Context context, MainActivity mainActivity, SensorManager sensorManager, GameTheme initialTheme, GameLevel initialLevel) {
 
         super(context);
         this.mainActivity =mainActivity;
-        gameLogic =new GameLogic(holder,this, this.mainActivity);
+        gameLogic =new GameLogic(holder,this, this.mainActivity, initialLevel);
 
         paint = new Paint();
         pearStartBit =BitmapFactory.decodeResource(getResources(), R.drawable.start);
@@ -64,9 +64,7 @@ public class PaintView extends SurfaceView implements SurfaceHolder.Callback, Se
         this.sensorManager = sensorManager;
         rotationVectorSensor = this.sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
 
-        gameTheme = new GameTheme();
-        gameTheme.setTextColor(Color.RED);
-        gameTheme.setBackgroundColor(Color.BLUE);
+        gameTheme = initialTheme;
     }
 
 
@@ -351,11 +349,13 @@ public class PaintView extends SurfaceView implements SurfaceHolder.Callback, Se
         float roll = orientation[2];
         Log.w("AZIMUTH, PITCH, ROLL", String.valueOf(azimuth) + " " + String.valueOf(pitch) + " " + String.valueOf(roll));
 
+        float pearPosition = width/2 + roll/ MAX_ROLL *width/2;
+
         if(gameLogic.gameState ==0){
-            if(roll> MAX_ROLL){pearXY[0]=width-pear.getWidth();}
+            if(roll> MAX_ROLL || pearPosition > width-pear.getWidth()){pearXY[0]=width-pear.getWidth();}
             else if(roll<-MAX_ROLL){pearXY[0]=0;}
             else{
-                pearXY[0] = width/2 + roll/ MAX_ROLL *width;
+                pearXY[0] = pearPosition;
             }
         }
     }

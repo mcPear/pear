@@ -36,16 +36,18 @@ public class GameLogic extends Thread {
     private int[] steps = new int[19];
     int bestScore;
     boolean again=false;
+    GameLevel gameLevel;
 
 
 
     //POTRZEBNE DO OBSŁUGI W PaintView
-    public GameLogic(SurfaceHolder surfaceHolder, PaintView paintView, MainActivity mainActivity) {
+    public GameLogic(SurfaceHolder surfaceHolder, PaintView paintView, MainActivity mainActivity, GameLevel initialLevel) {
         super();
         this.surfaceHolder = surfaceHolder;
         this.paintView = paintView;
         this.context = mainActivity;
         this.gameState = 2;
+        gameLevel = initialLevel;
     }
 
     public void loadScreenDimensions(){
@@ -137,7 +139,10 @@ public class GameLogic extends Thread {
                     steps[17]= canvasWidth /20;
                     steps[18]=(int)((double) canvasWidth /19.2);
 
-
+                    //FIT ARROW STEPS TO GAME LEVEL (excluding the slowest one)
+                    for(int i=1; i<steps.length; i++){
+                        steps[i] *= gameLevel.getArrowStepRatio();
+                    }
 
                     //PRĘDKOŚCI STRZAŁ NA KOLEJNYCH LVLACH
                     if (gameState == 0) {
