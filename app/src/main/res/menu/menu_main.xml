@@ -2,41 +2,32 @@
       xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:tools="http://schemas.android.com/tools"
       tools:context="com.lab.gruszczynski.pear.MainActivity">
-    <item android:id="@+id/action_settings"
-          android:title="@string/action_settings"
-          android:orderInCategory="100"
-          app:showAsAction="ifRoom"/>
     <item android:id="@+id/action_theme"
           android:title="@string/action_theme"
-          android:orderInCategory="100"
+          android:icon="@drawable/ic_visibility_black_24dp"
           app:showAsAction="ifRoom">
     <menu>
         <item android:id="@+id/theme_blue"
               android:title="@string/theme_blue"
-              android:orderInCategory="100"
               app:showAsAction="never"/>
         <item android:id="@+id/theme_main"
               android:title="@string/theme_main"
-              android:orderInCategory="100"
               app:showAsAction="never"/>
     </menu>
     </item>
     <item android:id="@+id/action_level"
           android:title="@string/action_level"
           android:orderInCategory="100"
-          app:showAsAction="ifRoom">
+          app:showAsAction="always">
     <menu>
         <item android:id="@+id/level_sandbox"
               android:title="@string/level_sandbox"
-              android:orderInCategory="100"
               app:showAsAction="never"/>
         <item android:id="@+id/level_medium"
               android:title="@string/level_medium"
-              android:orderInCategory="100"
               app:showAsAction="never"/>
         <item android:id="@+id/level_russia"
               android:title="@string/level_russia"
-              android:orderInCategory="100"
               app:showAsAction="never"/>
     </menu>
     </item>

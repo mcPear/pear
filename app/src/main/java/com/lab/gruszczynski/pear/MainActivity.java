@@ -44,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
         paintView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
         content_main_layout.addView(paintView);
 
-
     }
 
     @Override
@@ -90,14 +89,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        //gameLogic.notify();
         paintView.start();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        //try{gameLogic.wait();} catch(InterruptedException e) {e.printStackTrace();}
+        Log.d("@@@@@@@", "pause");
         paintView.stop();
     }
 

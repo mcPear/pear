@@ -79,7 +79,7 @@ public class PaintView extends SurfaceView implements SurfaceHolder.Callback, Se
         s1Bit=BitmapFactory.decodeResource(getResources(), R.drawable.fullarrow);
         arr1 =Bitmap.createScaledBitmap(s1Bit, (int)(width /14.29), (int)(width *0.17), true);
         arr5 = arr4 = arr3 = arr2 = arr1;
-        if(!gameLogic.isAlive()) gameLogic.start();
+        if(gameLogic.getState() == Thread.State.NEW){ gameLogic.start(); }
     }
 
     public void surfaceDestroyed(SurfaceHolder arg0) {
@@ -347,7 +347,7 @@ public class PaintView extends SurfaceView implements SurfaceHolder.Callback, Se
         float azimuth = orientation[0];
         float pitch = orientation[1];
         float roll = orientation[2];
-        Log.w("AZIMUTH, PITCH, ROLL", String.valueOf(azimuth) + " " + String.valueOf(pitch) + " " + String.valueOf(roll));
+        //Log.w("AZIMUTH, PITCH, ROLL", String.valueOf(azimuth) + " " + String.valueOf(pitch) + " " + String.valueOf(roll));
 
         float pearPosition = width/2 + roll/ MAX_ROLL *width/2;
 
